@@ -1,0 +1,579 @@
+
+
+                                                             P. Estrela 
+   Internet Draft                                               A.Grilo 
+                                                               T. Vazƒo 
+                                                               M. Nunes 
+   Document: draft-estrela-timip-00.txt                           INESC 
+   Expires: September 2002                                   March 2002 
+ 
+ 
+                  Terminal Independent Mobile IP (TIMIP) 
+ 
+ 
+Status of this Memo 
+ 
+   This document is an Internet-Draft and is in full conformance 
+   with all provisions of Section 10 of RFC2026. 
+    
+    
+   Internet-Drafts are working documents of the Internet Engineering 
+   Task Force (IETF), its areas, and its working groups.  Note that      
+   other groups may also distribute working documents as Internet-
+   Drafts. 
+    
+   Internet-Drafts are draft documents valid for a maximum of six 
+   months and may be updated, replaced, or obsoleted by other documents 
+   at any time.  It is inappropriate to use Internet-Drafts as 
+   reference material or to cite them other than as "work in progress." 
+    
+   The list of current Internet-Drafts can be accessed at 
+        http://www.ietf.org/ietf/1id-abstracts.txt 
+   The list of Internet-Draft Shadow Directories can be accessed at 
+        http://www.ietf.org/shadow.html. 
+    
+    
+Abstract 
+    
+   IP mobility protocols usually assume that the mobile nodes have a 
+   mobility-aware IP stack, which is still a scenario that can seldom 
+   be found nowadays. Most terminals, including laptops and PDAs, still 
+   use legacy IP stacks, limiting their use to layer-2 mobility between 
+   Access Points (APs) connected to the same Access Router (AR) within 
+   a single IP subnet. This document presents Terminal Independent 
+   Mobile IP (TIMIP), which supports IP mobility of mobility-unaware 
+   mobile nodes with legacy IP stacks, while fully interoperating with 
+   Mobile IP to provide macromobility across IP subnets. 
+ 
+ 
+
+
+
+
+
+
+
+
+
+     
+   Estrela                                                           1 
+   Internet-draft        Terminal Independent               March 2002 
+                        Mobility for IP (TIMIP) 
+    
+Table of Contents 
+    
+   Status of this Memo................................................1 
+   Abstract...........................................................1 
+   1. Introduction....................................................2 
+     1.1 Applicability................................................2 
+   2. Terminology.....................................................3 
+   3. Architecture....................................................3 
+   4. Registration....................................................4 
+   5. Power-up........................................................5 
+   6. Micromobility...................................................7 
+   7. Macromobility...................................................8 
+     7.1. Macromobility for LMNs......................................8 
+     7.2. Macromobility for MIP terminals.............................9 
+   8. References.....................................................10 
+   9. Author's Addresses.............................................10 
+ 
+1. Introduction 
+    
+   TIMIP [1] is a micromobility architecture that allows Mobile Nodes 
+   with legacy IP stacks to roam within an IP subnet. Macromobility, 
+   i.e. mobility across subnet boundaries, still relies on Mobile IP 
+   [2]. The main features of TIMIP are listed below, some of them being 
+   already present in other micromobility architectures, namely CIP [3] 
+   or HAWAII [4]: 
+    
+   - TIMIP does not require changes to the IP protocol stack of mobile 
+     nodes, either for micromobility or macromobility. 
+   - Refreshing of routing paths is performed by data packets sent by 
+     the mobile terminals, with signaling being employed only when no 
+     traffic is detected at the routers for a certain time interval 
+     (CIP). 
+   - Routing reconfiguration during handoff within a TIMIP domain only 
+     needs to change the routing tables of the Access Routers located 
+     in the shortest path between the New Access Point and the Old 
+     Access Point (HAWAII). 
+   - Routing of data packets within a TIMIP domain does not need to 
+     reach the Access Network Gateway, involving only the Access 
+     Routers located in the shortest path between the sender and the 
+     receiver (HAWAII). 
+    
+1.1 Applicability 
+    
+   TIMIP is applicable within LANs, and possibly larger corporate networks that 
+   form one subnet only. To provide mobility between subnets 
+   (macromobility), Mobile IP [2] should be supported in the Access 
+   Network Gateway of the TIMIP domain. 
+    
+   It is assumed that the data link layer of the Access Points is able 
+   to perform terminal power-up detection and to notify the TIMIP 
+   layer. 
+    
+   Estrela                                                    [Page 2] 
+   Internet-draft        Terminal Independent               March 2002 
+                        Mobility for IP (TIMIP) 
+    
+    
+   It is also assumed that the Access Routers of the TIMIP domain form 
+   a logical tree, with the Access Network Gateway located at the top. 
+    
+2. Terminology 
+    
+   Access Network 
+   An IP network that includes one or more Access Routers and a Access 
+   Network Gateway. 
+    
+   Access Network Gateway (ANG) 
+   An Access Router that separates the Access Network from a third 
+   party network. 
+    
+   Access Point (AP) 
+   An Access Router that offers layer-2 connectivity to Mobile Nodes. 
+    
+   Access Router (AR) 
+   An IP router residing in an Access Network and connected to one or 
+   more access points. An AR offers connectivity to Mobile Nodes. The 
+   router may include intelligence beyond simple forwarding service 
+   offered by ordinary IP routers. Some Access Routers can be Access 
+   Points. 
+    
+   Legacy Mobile Node (LMN) 
+   A Mobile Node whose IP layer is not aware of mobility.  
+    
+   Mobile Node (MN) 
+   An IP end-node capable of changing its point of attachment to the 
+   network. 
+    
+   Subnet 
+   A range of IP address designed by a common prefix. 
+    
+3. Architecture 
+    
+   A TIMIP domain is an IP subnet organized as a logical tree of Access 
+   Routers (ARs) whose root router is the Access Network Gateway (ANG). 
+   The Access Routers are also layer-2 Access Points (APs), which 
+   interface directly with the MNs through the wireless medium (WM). 
+   The architectural diagram of TIMIP is depicted in Figure 1. 
+    
+
+
+
+
+
+
+
+
+
+
+
+    
+   Estrela                                                    [Page 3] 
+   Internet-draft        Terminal Independent               March 2002 
+                        Mobility for IP (TIMIP) 
+    
+                 |       +-+        +-----+                   +-----+  
+                [] <-->  | | -------| AR5 |-------------------|     |  
+                MN       +-+       /+-----+                  /| ANG |- 
+                       AP/AR1     /                         / |     |  
+                                 /                         /  +-----+  
+                         +-+    /                         /            
+                         | |----                         /             
+                         +-+                            /              
+                       AP/AR2                          /               
+                                                      /                
+                         +-+        +-----+          /                 
+                         | |--------| AR6 |----------                  
+                         +-+       /+-----+                            
+                       AP/AR3     / 
+                                 / 
+                         +-+    / 
+                         | |---- 
+                         +-+   
+                       AP/AR4 
+    
+            Figure 1: Architectural Diagram of a TIMIP domain. 
+    
+   As a Legacy Mobile Node (LMN) has a legacy IP stack and cannot issue 
+   any signaling during handoff, handoff detection by the AR relies on 
+   notification from layer-2. This notification triggers routing 
+   reconfiguration of the TIMIP domain, leading to routing table 
+   updating at the ARs. 
+    
+4. Registration 
+    
+   In order to allow attachment of an MN to a TIMIP domain, the MN must 
+   be previously registered at the ANG. This is accomplished offline 
+   through management procedures. For each MN recognized in a TIMIP 
+   domain, registration information consists on the following: 
+    
+   - MAC address of the MN; 
+   - IP Address of the MN; 
+   - MIP capability; 
+   - IP address of the MIP Home Agent; 
+   - Authentication Key; 
+   - Authentication option. 
+    
+   The MIP capability parameter specifies if MIP is required, either 
+   implemented at the ANG on behalf of legacy terminal (surrogate MIP) 
+   or implemented at the terminal itself. If the terminal has a legacy 
+   IP protocol stack, the next two parameters specify respectively the 
+   IP address of its Home Agent and the authentication key to be used 
+   between the terminal and the ANG when the authentication option is 
+   turned on. It should be noted that TIMIP authentication is mandatory 
+   for macromobility scenarios for both MIP and legacy terminals. The 
+   IP address of the Home Agent is not used when the terminal 
+   implements MIP, as the terminal itself is responsible for 
+   registering with the Home Agent, bypassing the ANG. 
+    
+   Estrela                                                    [Page 4] 
+   Internet-draft        Terminal Independent               March 2002 
+                        Mobility for IP (TIMIP) 
+    
+    
+   Once this data is configured at the ANG, it is forwarded to the APs 
+   (except the authentication key) so that they are able to know the IP 
+   address of newly associated terminals based on their MAC address 
+   provided by layer-2 as explained below. 
+    
+5. Power-up 
+    
+   When a terminal firstly appears in a TIMIP domain, a routing path is 
+   created along the hierarchy of ARs. Consider the scenario in Figure 
+   1. When the MN attaches itself to AR1, the creation of the routing 
+   path takes the following steps: 
+    
+   1. The MT performs a layer-2 association with an AP that belongs to 
+      the local TIMIP domain. 
+    
+   2. At the AP, layer-2 notifies the IP layer about the presence of 
+      the MT in its wireless interface, triggering the routing 
+      reconfiguration procedure. Layer-2 sends the MAC address of the 
+      terminal to the IP layer. The MAC address is matched against the 
+      terminal registration information broadcasted by the ANG and the 
+      respective IP address is found. As the New AP has currently no 
+      routing table entry for the MT, the routing table is updated with 
+      the addition of this new entry. 
+    
+   3. The New AP sends a RoutingUpdate message up to the AR at 
+      hierarchical level 2. This AR acknowledges with a 
+      RoutingUpdateAck message, and updates its routing table 
+      accordingly with the addition of a new entry relative to the MT. 
+      This entry points to the source of the RoutingUpdate message (in 
+      this case the AP) in order to specify the path through which the 
+      terminal can be reached. 
+    
+   4. Exchange of RoutingUpdate/RoutingUpdateAck messages climbs up the 
+      hierarchy levels. At each level, the routing table is updated 
+      with the creation of a new entry relative to the MT. This entry 
+      always points to the source of the RoutingUpdate message in order 
+      to specify the path through which the MT can be reached. 
+ 
+   5. Exchange of RoutingUpdate/RoutingUpdateAck messages reaches the 
+      ANG, completing the creation of the new routing path. 
+    
+   The MT is now reachable through the routing path established by the 
+   above procedures. The ARs that do not belong to this path have no 
+   routing entry for the MT. At these ARs, all packets destined to the 
+   MT are forwarded up the hierarchy of routers by default. All packets 
+   that arrive at an AR whose routing table has an entry to the 
+   destination, are forwarded down the hierarchy of routers until they 
+   reach the radio interface in which the MT is located. Packets 
+   destined to a terminal located in the same TIMIP domain as the 
+   source, only in the worst case reach the ANG. 
+    
+
+    
+   Estrela                                                    [Page 5] 
+   Internet-draft        Terminal Independent               March 2002 
+                        Mobility for IP (TIMIP) 
+    
+   The RoutingUpdate and RoutingUpdateAck messages include a timestamp 
+   generated at the New AP. As in TIMIP all APs are synchronized by 
+   means of the Network Time Protocol (NTP) [5], this guarantees 
+   consistency even when the MT moves faster than the route 
+   reconfiguration. 
+    
+   It should also be noted that the routing path is soft-state and 
+   after its establishment, it is refreshed by the data packets sent by 
+   the MT. Nevertheless, as the packets are routed within the TIMIP 
+   domain, some of the ARs may not be refreshed. When this occurs, the 
+   routing entry for the MT becomes invalid after a predefined timeout 
+   (e.g. 10s). The AR where the timer expired starts to send ICMP 
+   EchoRequest messages to the terminal, filling the source address 
+   field of the IP header with the IP address of the ANG. This forces 
+   the MT to reply with EchoReply messages destined to the ANG, which 
+   will refresh all the routing path within the TIMIP domain. If the MT 
+   does not reply within a predefined timeout (e.g. 60s), the routing 
+   entry for the MT is removed. 
+    
+   This basic TIMIP configuration is adequate to have micromobility in 
+   wireless access networks where security is not an issue. 
+   Nevertheless, just like in other unprotected IP networks, it allows 
+   MTs to power-on with false MAC and IP addresses. In order to avoid 
+   this, a minimal security functionality must be implemented at the MT 
+   itself. However, this can be done in the application layer with no 
+   need to change the IP protocol stack. When the authentication option 
+   is turned on, it is assumed that the MT runs a special security 
+   application, which uses a database of authentication keys for the 
+   different TIMIP domains in which the MT is allowed to power-up. This 
+   database is indexed by the IP addresses of the ANGs that are the 
+   root of the respective networks. 
+    
+   The authentication takes place in step 2 of the power-on procedure, 
+   immediately after layer-2 notifies the IP layer of the AP about the 
+   association of the MT. The AP sends an SignatureRequest message to a 
+   well known UDP port in the MT. This message carries <IP address of 
+   the MT, IP address of the ANG, rand, timestamp>, where rand is a 
+   random value and the timestamp is an NTP formatted 64-bit value. The 
+   same message is sent to the ANG. Both the MT and the ANG answer the 
+   AP with a SignatureReply message containing the same fields present 
+   in the SignatureRequest message, plus its 128-bit MD5 message digest 
+   [6] calculated with the authentication key of the MT for this 
+   network. The latter is only known by the MT (based on the 
+   authentication key database and the IP address of the ANG) and the 
+   ANG (based on the registration information). The AP compares the 
+   signatures of the two SignatureReply messages, and proceeds with the 
+   routing reconfiguration procedures in case there is a match. 
+    
+    
+    
+    
+    
+
+    
+   Estrela                                                    [Page 6] 
+   Internet-draft        Terminal Independent               March 2002 
+                        Mobility for IP (TIMIP) 
+    
+6. Micromobility 
+    
+   An example of handoff between two APs that belong to the same access 
+   subnetwork is depicted in 2. 
+    
+    
+                 |       +-+        +-----+                   +-----+  
+                [] <-->  | | -------| AR5 |-------------------|     |  
+                MN       +-+       /+-----+                  /| ANG |- 
+                       AP/AR1     /                         / |     |  
+                 |               /                         /  +-----+  
+                 |       +-+    /                         /            
+                 |       | |----                         /             
+        (handoff)V       +-+                            /              
+                       AP/AR2                          /               
+                                                      /                
+                         +-+        +-----+          /                 
+                         | |--------| AR6 |----------                  
+                         +-+       /+-----+                            
+                       AP/AR3     / 
+                                 / 
+                         +-+    / 
+                         | |---- 
+                         +-+   
+                       AP/AR4 
+                      Figure 2: Handoff between APs. 
+    
+    
+   The Handoff procedure takes the following steps: 
+    
+   The first four steps of the Handoff procedure are the same as those 
+   of the Power-up case. The remaining steps are the following: 
+    
+   5. Exchange of RoutingUpdate/RoutingUpdateAck messages climbs up the 
+      hierarchy levels, until the crossover AR (the AR that belongs 
+      simultaneously to the old path and to the new path) is reached 
+      (in the example above, node AR5). Now that the new routing path 
+      is completely created, the old path must be deleted. This 
+      procedure starts when the crossover AR sends a RoutingUpdate 
+      message addressed to the MT through the old routing path. The AR 
+      that receives the message realizes that the MT is no longer 
+      accessible through it, updates its routing path by deleting the 
+      entry that corresponds to the MT and replies with a 
+      RoutingUpdateAck message. 
+    
+   6. Exchange of RoutingUpdate/RoutingUpdateAck messages goes down the 
+      AR tree following the old path, until the Old AP is reached. At 
+      each level, the routing table is updated by deleting the entry 
+      relative to the MT. 
+    
+   In a normal shared media LAN, when a terminal has a packet destined 
+   to an address within the same IP subnet (which is known through the 
+   analysis of the IP address prefix), it tries to obtain the MAC 
+    
+   Estrela                                                    [Page 7] 
+   Internet-draft        Terminal Independent               March 2002 
+                        Mobility for IP (TIMIP) 
+    
+   address of the destination through an ARP request and send the 
+   packet directly to it. In TIMIP, as the APs are also ARs, if the 
+   destination is associated to a different AP, the ARP request will 
+   never be answered. In order to prevent this situation, the terminal 
+   is forced to send all packets to the IP Gateway of the local 
+   subnetwork (which corresponds to the ANG) through the AP, which is 
+   accomplished by setting the subnetwork mask configuration to 
+   255.255.255.255. When the terminal sends an ARP request to obtain 
+   the MAC address of the Gateway, the local AP answers with its own 
+   MAC address. 
+    
+    
+7. Macromobility 
+    
+   TIMIP relies on MIP to support macromobility. The ANG is the HA for 
+   MNs whose home network is its TIMIP domain. As LMNs do not implement 
+   MIP, the ANG implements all the needed functionality on their 
+   behalf. On the other hand, when a foreign MN supports MIP, the ANG 
+   acts as a Foreign Agent for the local TIMIP domain. 
+    
+7.1. Macromobility for LMNs 
+    
+   When a MT enters a TIMIP domain different from its current location, 
+   the terminal is locally authenticated and a routing path is created 
+   between the terminal and the ANG. Packets are then sent/received 
+   to/from the outside through the ANG. If the home network of the MT 
+   is a different MIP domain, its HA must be notified so that packets 
+   can be correctly routed through an IP tunnel established from the HA 
+   to the FA located at the ANG. 
+    
+   After consulting the registration information of the MT (namely the 
+   IP address of the HA and the MIP capability), the ANG realizes that 
+   it is a foreign MT and that it does not implement MIP. Consequently, 
+   the ANG must act as a MIP proxy on behalf of the MT, generating all 
+   MIP signaling as the MT would. Firstly it has to notify the HA about 
+   the MTÆs new location and CoAddr by means of a MIP Registration 
+   Request message, which requires authentication using the 
+   authentication key between the MT and the HA. As the ANG does not 
+   know this key, it is the MT that must sign the message. The ANG 
+   sends the MT an AuthenticationRequest message containing <IP address 
+   of the ANG, IP address of the HA, MIP Registration Request, 
+   timestamp> authenticated by the ANG with MD5(K1, 
+   AuthenticationRequest), where K1 is the authentication key between 
+   the MT and ANG for this TIMIP domain. The MT finds K1 in the key 
+   database based on the IP address of the ANG and obtains the 
+   authentication key of his home network (K2) in the key database, 
+   based on the IP address of the HA. It then answers with an 
+   AuthenticationReply message containing <IP address of the ANG, IP 
+   address of the HA, MD5(K2, MIP Registration Request), timestamp>. 
+   This message is also authenticated by the terminal with MD5(K1, 
+   AuthenticationReply). The ANG can now send a correctly authenticated 
+   MIP Registration Request message to the HA adding the message digest 
+   provided by the MT as a Mobile-Home Authentication Extension field. 
+    
+   Estrela                                                    [Page 8] 
+   Internet-draft        Terminal Independent               March 2002 
+                        Mobility for IP (TIMIP) 
+    
+    
+   The HA answers with an authenticated MIP Registration Reply message, 
+   which has a message digest MD5(K2, MIP Registration Reply) appended 
+   as a Mobile-Home Authentication Extension field. In order to verify 
+   the identity of the HA, the ANG must again rely on the MT. It sends 
+   an AuthenticationRequest message to the MT, containing <IP address 
+   of the ANG, IP address of the HA, MIP Registration Reply (except the 
+   Mobile-Home Authentication Extension), timestamp>, authenticated 
+   with MD5(K1, Authentication Request). The terminal answers with an 
+   AuthenticationReply message containing <IP address of the ANG, IP 
+   address of the HA, MD5(K2, MIP Registration Reply), timestamp>. If 
+   the MD5 digest of the MIP Registration Reply provided by the MT 
+   matches that present in the Mobile-Home Authentication Extension of 
+   the Registration Reply message sent by the HA, the ANG can resume 
+   communication with the HA. 
+    
+   After the communication with the HA is established, the ANG de-
+   encapsulates the tunneled IP packets that come from the HA addressed 
+   to the MT and forwards them normally to the MT according to the 
+   routing path established in the AR tree. Packets generated by the MT 
+   are routed normally according to the same procedures described above 
+   for micromobility. 
+    
+   As already seen, all traffic that crosses the boundary of the TIMIP 
+   domain must pass through the ANG, which is the IP Gateway to the 
+   core network. Nevertheless, whenever an MT moves to a different 
+   domain, the IP address of the ANG changes. In order to keep 
+   consistency, the MT must change its IP Gateway configuration at each 
+   handoff between TIMIP domains, otherwise the ARP requests to obtain 
+   the MAC address of the IP Gateway would not be answered by the APs. 
+   This inconvenience is avoided by configuring the MTs with a well-
+   known ANG IP address recognized by all APs of all TIMIP domains. The 
+   latter broadcast gratuitous ARP messages associating their own MAC 
+   addresses with the well-known ANG IP address each time a terminal 
+   performs an association. 
+    
+7.2. Macromobility for MIP terminals 
+    
+   When the MT supports MIP but belongs to a different domain, the ANG 
+   plays the role of FA. The MT powers-on in the same way as legacy MTs 
+   in the TIMIP domain. Once this is completed, the MIP signaling 
+   starts. The ANG broadcasts RFC 1256 [7] Router Advertisement 
+   messages periodically, specifying its IP address as the MIP CoAddr. 
+   In order to haste the process, the MT can request the advertisement 
+   by broadcasting a Router Solicitation message, which is then 
+   forwarded by the AP to the ANG. 
+    
+   After the MT receives a Router Advertisement message, it notifies 
+   its HA about the CoAddr through the ANG. The HA is then able to 
+   forward the incoming packets to the CoAddr through an IP tunnel. The 
+   ANG de-encapsulates the IP packets and forwards them normally to the 
+   MT according to the routing path established in the AR tree. Packets 
+   generated by the MT are also routed normally within the TIMIP 
+    
+   Estrela                                                    [Page 9] 
+   Internet-draft        Terminal Independent               March 2002 
+                        Mobility for IP (TIMIP) 
+    
+   domain. Handoff between APs within the foreign TIMIP domain are 
+   dealt with TIMIP micromobility procedures only (see above) as the FA 
+   is always the same (i.e. the ANG).  
+   It should be noted that in this case it is the MT itself that 
+   authenticates the MIP messages when communicating with the HA. 
+ 
+    
+8. References 
+    
+   1  Grilo A., Estrela P., Nunes M., Terminal Independent Mobility for 
+      IP (TIMIP)ö, IEEE Communications, Vol. 39 N¦12, December 2001. 
+    
+   2  Perkins C. (Editor), "IP Mobility Support", RFC 2002, IETF, 
+      October 1996.  
+    
+   3  A. Campbell et al, ôDesign, Implementation and Evaluation of 
+      Cellular IPö, IEEE Personal Communications, Vol. 7 N¦4, August 
+      2000. 
+    
+   4  R. Ramjee et al, ôIP-Based Access Network Infrastructure for 
+      Next-Generation Wireless Data Networksö, IEEE Personal 
+      Communications, Vol. 7 N¦4, August 2000. 
+ 
+   5  Mills D. ôNetwork Time Protocol (Version 3), Specification, 
+      Implementation and Analysisö, RFC 1305, IETF, March 1992.  
+    
+   6  Rivest R., ôThe MD5 Message-Digest Algorithmö, RFC 1321, IETF, 
+      April 1992. 
+    
+   7  Deering S. (Editor), ôICMP Router Discovery Messagesö, RFC 1256, 
+      IETF, September 1991. 
+    
+9. Author's Addresses 
+    
+   Pedro Estrela 
+   INESC 
+   Rua Alves Redol, N.9         Phone:  +351-213100324 
+   1000 Lisboa, Portugal        Email:  pedro.estrela@inesc.pt 
+    
+   Antnio Grilo 
+   INESC 
+   Rua Alves Redol, N.9         Phone:  +351-213100226 
+   1000 Lisboa, Portugal        Email:  amg@cris.inesc.pt 
+    
+   Teresa Vazƒo 
+   INESC 
+   Rua Alves Redol, N.9         Phone:  +351-213100286 
+   1000 Lisboa, Portugal        Email:  teresa.vazao@inesc.pt 
+    
+   Mßrio Nunes 
+   INESC 
+   Rua Alves Redol, N.9         Phone:  +351-213100256 
+   1000 Lisboa, Portugal        Email:  msn@inesc.pt 
+    
+   Estrela                                                   [Page 10] 
