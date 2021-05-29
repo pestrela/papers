@@ -12,4 +12,4 @@ Thia image has the crux of his point:
 * Lost product market fit: a pretty bad deal. This is where the vast majority of the companies are (even if tye do not appreciate that such is the case for them)
 * Going down: an excellent learning experience of what **NOT** to do. An invaluable experience.
 
-!{[](https://miro.medium.com/max/5998/1*1CC7tloEPyebgtFjybiRpg.png)
+![ ](https://miro.medium.com/max/5998/1*1CC7tloEPyebgtFjybiRpg.png)
